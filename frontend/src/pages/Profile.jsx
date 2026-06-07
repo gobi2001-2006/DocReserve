@@ -1,228 +1,411 @@
-import React, { useState } from "react";
-import { assets } from "../assets/assets";
+import React, { useContext, useEffect, useState } from "react";
+import { AppContext } from "../context/AppContext";
+import axios from "axios";
+import { toast } from "react-toastify";
 
 const Profile = () => {
 
+  const {
+    userData,
+    backendUrl,
+    token,
+    loadUserProfileData
+  } = useContext(AppContext);
+
   const [isEdit, setIsEdit] = useState(false);
+  const [tempData, setTempData] = useState(null);
+  const [imageFile, setImageFile] = useState(false);
 
-  const [userData, setUserData] = useState({
-    name: "Gobika",
-    image: assets.profile_pic,
-    email: "gobika495@gmail.com",
-    phone: "",
-    address: {
-      line1: "",
-      line2: "",
-    },
-    gender: "",
-    dob: "",
-  });
+  useEffect(() => {
 
-  // Temporary state for editing (so cancel won't affect original data)
-  const [tempData, setTempData] = useState(userData);
+    if (userData) {
 
-  // When Edit clicked
-  const handleEditClick = () => {
-    setTempData(userData);
-    setIsEdit(true);
-  };
+      setTempData(userData);
 
-  // When Save clicked
-  const handleSave = () => {
-    setUserData(tempData);
-    setIsEdit(false);
-  };
-
-  // When Cancel clicked
-  const handleCancel = () => {
-    setIsEdit(false);
-  };
-
-  // Image Upload
-  const handleImageChange = (e) => {
-    const file = e.target.files[0];
-    if (file) {
-      const imageURL = URL.createObjectURL(file);
-      setTempData((prev) => ({
-        ...prev,
-        image: imageURL,
-      }));
     }
+
+  }, [userData]);
+
+  if (!userData || !tempData) {
+
+    return (
+      <div className="text-center mt-20 text-lg">
+        Loading Profile...
+      </div>
+    );
+
+  }
+
+  const handleImageChange = (e) => {
+
+    const file = e.target.files[0];
+
+    if (!file) return;
+
+    setImageFile(file);
+
+    setTempData((prev) => ({
+      ...prev,
+      image: URL.createObjectURL(file)
+    }));
+
+  };
+
+  const handleSave = async () => {
+
+    try {
+
+      const formData = new FormData();
+
+      formData.append("name", tempData.name);
+      formData.append("phone", tempData.phone);
+      formData.append("gender", tempData.gender);
+      formData.append("dob", tempData.dob);
+
+      formData.append(
+        "address",
+        JSON.stringify(tempData.address)
+      );
+
+      if (imageFile) {
+
+        formData.append("image", imageFile);
+
+      }
+
+      const { data } = await axios.post(
+        backendUrl + "/api/user/update-profile",
+        formData,
+        {
+          headers: {
+            token
+          }
+        }
+      );
+
+      if (data.success) {
+
+        toast.success(data.message);
+
+        await loadUserProfileData();
+
+        setIsEdit(false);
+
+      } else {
+
+        toast.error(data.message);
+
+      }
+
+    } catch (error) {
+
+      console.log(error);
+
+      toast.error(error.message);
+
+    }
+
   };
 
   return (
-    <div
-      style={{
-        maxWidth: "600px",
-        margin: "40px auto",
-        padding: "20px",
-        background: "#f5f5f5",
-        borderRadius: "10px",
-      }}
-    >
-      {/* Profile Image */}
-      <img
-        src={isEdit ? tempData.image : userData.image}
-        alt="Profile"
-        width="120"
-        style={{
-          borderRadius: "50%",
-          display: "block",
-          marginBottom: "15px",
-        }}
-      />
 
-      {isEdit && (
-        <input type="file" accept="image/*" onChange={handleImageChange} />
-      )}
+    <div className="max-w-3xl mx-auto p-6">
 
-      {/* Name */}
-      {isEdit ? (
-        <input
-          type="text"
-          value={tempData.name}
-          onChange={(e) =>
-            setTempData((prev) => ({ ...prev, name: e.target.value }))
-          }
-          style={{ fontSize: "22px", padding: "5px" }}
-        />
-      ) : (
-        <h2 style={{ textTransform: "capitalize" }}>
-          {userData.name}
-        </h2>
-      )}
+      <div className="bg-white rounded-xl shadow-lg p-8">
 
-      <hr />
+        {/* Profile Image */}
 
-      <h3>CONTACT INFORMATION</h3>
+        <div className="flex flex-col items-center">
 
-      <p><strong>Email:</strong> {userData.email}</p>
-
-      <p><strong>Phone:</strong></p>
-      {isEdit ? (
-        <input
-          type="text"
-          maxLength="10"
-          value={tempData.phone}
-          onChange={(e) =>
-            setTempData((prev) => ({
-              ...prev,
-              phone: e.target.value.replace(/\D/g, ""),
-            }))
-          }
-        />
-      ) : (
-        <p>{userData.phone || "Not Provided"}</p>
-      )}
-
-      <p><strong>Address:</strong></p>
-
-      {isEdit ? (
-        <div>
-          <input
-            type="text"
-            placeholder="Address line 1"
-            value={tempData.address.line1}
-            onChange={(e) =>
-              setTempData((prev) => ({
-                ...prev,
-                address: {
-                  ...prev.address,
-                  line1: e.target.value,
-                },
-              }))
-            }
+          <img
+            src={tempData.image}
+            alt="Profile"
+            className="w-36 h-36 rounded-full object-cover border"
           />
-          <br /><br />
-          <input
-            type="text"
-            placeholder="Address line 2"
-            value={tempData.address.line2}
-            onChange={(e) =>
-              setTempData((prev) => ({
-                ...prev,
-                address: {
-                  ...prev.address,
-                  line2: e.target.value,
-                },
-              }))
-            }
-          />
+
+          {
+            isEdit && (
+              <input
+                type="file"
+                accept="image/*"
+                onChange={handleImageChange}
+                className="mt-4"
+              />
+            )
+          }
+
         </div>
-      ) : (
-        <p>
-          {userData.address.line1 || "Not Provided"}
-          <br />
-          {userData.address.line2}
-        </p>
-      )}
 
-      <hr />
+        {/* Name */}
 
-      <h3>BASIC INFORMATION</h3>
+        <div className="mt-6">
 
-      <p><strong>Gender:</strong></p>
-      {isEdit ? (
-        <select
-          value={tempData.gender}
-          onChange={(e) =>
-            setTempData((prev) => ({ ...prev, gender: e.target.value }))
+          <label className="font-semibold">
+            Full Name
+          </label>
+
+          {
+            isEdit ? (
+
+              <input
+                type="text"
+                value={tempData.name}
+                onChange={(e) =>
+                  setTempData({
+                    ...tempData,
+                    name: e.target.value
+                  })
+                }
+                className="w-full border p-2 rounded mt-1"
+              />
+
+            ) : (
+
+              <p className="text-lg mt-1">
+                {userData.name}
+              </p>
+
+            )
           }
-        >
-          <option value="">Select Gender</option>
-          <option value="Male">Male</option>
-          <option value="Female">Female</option>
-        </select>
-      ) : (
-        <p>{userData.gender || "Not Selected"}</p>
-      )}
 
-      <p><strong>Birthday:</strong></p>
-      {isEdit ? (
-        <input
-          type="date"
-          value={tempData.dob}
-          onChange={(e) =>
-            setTempData((prev) => ({ ...prev, dob: e.target.value }))
+        </div>
+
+        {/* Email */}
+
+        <div className="mt-4">
+
+          <label className="font-semibold">
+            Email
+          </label>
+
+          <p className="mt-1">
+            {userData.email}
+          </p>
+
+        </div>
+
+        {/* Phone */}
+
+        <div className="mt-4">
+
+          <label className="font-semibold">
+            Phone
+          </label>
+
+          {
+            isEdit ? (
+
+              <input
+                type="text"
+                value={tempData.phone}
+                onChange={(e) =>
+                  setTempData({
+                    ...tempData,
+                    phone: e.target.value
+                  })
+                }
+                className="w-full border p-2 rounded mt-1"
+              />
+
+            ) : (
+
+              <p className="mt-1">
+                {userData.phone}
+              </p>
+
+            )
           }
-        />
-      ) : (
-        <p>{userData.dob || "Not Selected"}</p>
-      )}
 
-      <br /><br />
+        </div>
 
-      {/* Buttons */}
-      {!isEdit ? (
-        <button
-          onClick={handleEditClick}
-          style={buttonStyle}
-        >
-          Edit
-        </button>
-      ) : (
-        <>
-          <button onClick={handleSave} style={buttonStyle}>
-            Save
-          </button>
-          <button
-            onClick={handleCancel}
-            style={{ ...buttonStyle, marginLeft: "10px", borderColor: "red" }}
-          >
-            Cancel
-          </button>
-        </>
-      )}
+        {/* Gender */}
+
+        <div className="mt-4">
+
+          <label className="font-semibold">
+            Gender
+          </label>
+
+          {
+            isEdit ? (
+
+              <select
+                value={tempData.gender}
+                onChange={(e) =>
+                  setTempData({
+                    ...tempData,
+                    gender: e.target.value
+                  })
+                }
+                className="w-full border p-2 rounded mt-1"
+              >
+                <option>Male</option>
+                <option>Female</option>
+                <option>Other</option>
+              </select>
+
+            ) : (
+
+              <p className="mt-1">
+                {userData.gender}
+              </p>
+
+            )
+          }
+
+        </div>
+
+        {/* DOB */}
+
+        <div className="mt-4">
+
+          <label className="font-semibold">
+            Date of Birth
+          </label>
+
+          {
+            isEdit ? (
+
+              <input
+                type="date"
+                value={tempData.dob}
+                onChange={(e) =>
+                  setTempData({
+                    ...tempData,
+                    dob: e.target.value
+                  })
+                }
+                className="w-full border p-2 rounded mt-1"
+              />
+
+            ) : (
+
+              <p className="mt-1">
+                {userData.dob}
+              </p>
+
+            )
+          }
+
+        </div>
+
+        {/* Address */}
+
+        <div className="mt-4">
+
+          <label className="font-semibold">
+            Address Line 1
+          </label>
+
+          {
+            isEdit ? (
+
+              <input
+                type="text"
+                value={tempData.address.line1}
+                onChange={(e) =>
+                  setTempData({
+                    ...tempData,
+                    address: {
+                      ...tempData.address,
+                      line1: e.target.value
+                    }
+                  })
+                }
+                className="w-full border p-2 rounded mt-1"
+              />
+
+            ) : (
+
+              <p className="mt-1">
+                {userData.address?.line1}
+              </p>
+
+            )
+          }
+
+        </div>
+
+        <div className="mt-4">
+
+          <label className="font-semibold">
+            Address Line 2
+          </label>
+
+          {
+            isEdit ? (
+
+              <input
+                type="text"
+                value={tempData.address.line2}
+                onChange={(e) =>
+                  setTempData({
+                    ...tempData,
+                    address: {
+                      ...tempData.address,
+                      line2: e.target.value
+                    }
+                  })
+                }
+                className="w-full border p-2 rounded mt-1"
+              />
+
+            ) : (
+
+              <p className="mt-1">
+                {userData.address?.line2}
+              </p>
+
+            )
+          }
+
+        </div>
+
+        {/* Buttons */}
+
+        <div className="mt-8 flex gap-4">
+
+          {
+            !isEdit ? (
+
+              <button
+                onClick={() => setIsEdit(true)}
+                className="bg-blue-600 text-white px-6 py-2 rounded"
+              >
+                Edit Profile
+              </button>
+
+            ) : (
+
+              <>
+                <button
+                  onClick={handleSave}
+                  className="bg-green-600 text-white px-6 py-2 rounded"
+                >
+                  Save Changes
+                </button>
+
+                <button
+                  onClick={() => {
+                    setTempData(userData);
+                    setIsEdit(false);
+                  }}
+                  className="bg-red-500 text-white px-6 py-2 rounded"
+                >
+                  Cancel
+                </button>
+              </>
+            )
+          }
+
+        </div>
+
+      </div>
+
     </div>
-  );
-};
 
-const buttonStyle = {
-  padding: "8px 20px",
-  borderRadius: "20px",
-  border: "1px solid blue",
-  background: "white",
-  cursor: "pointer",
+  );
+
 };
 
 export default Profile;

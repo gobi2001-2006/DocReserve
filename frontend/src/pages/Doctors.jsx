@@ -6,21 +6,27 @@ const Doctors = () => {
 
   const { speciality } = useParams()
   const navigate = useNavigate()
+
   const { doctors } = useContext(AppContext)
+
+  console.log("Doctors data:", doctors)
 
   const [filterDoc, setFilterDoc] = useState([])
   const [showFilter, setShowFilter] = useState(false)
 
   useEffect(() => {
 
-    if (!doctors) return
+    console.log("Current Speciality:", speciality)
 
     if (speciality) {
 
       const filtered = doctors.filter(
         (doc) =>
-          doc?.speciality?.toLowerCase() === speciality.toLowerCase()
+          doc.speciality?.toLowerCase().trim() ===
+          decodeURIComponent(speciality).toLowerCase().trim()
       )
+
+      console.log("Filtered Doctors:", filtered)
 
       setFilterDoc(filtered)
 
@@ -50,8 +56,8 @@ const Doctors = () => {
       </p>
 
       <div className="flex flex-col sm:flex-row gap-6">
-        
 
+        {/* Mobile Filter Button */}
         <button
           className={`py-1 px-3 border rounded text-sm transition-all sm:hidden 
           ${showFilter ? 'bg-blue-600 text-white' : ''}`}
@@ -60,7 +66,7 @@ const Doctors = () => {
           Filters
         </button>
 
-
+        {/* Sidebar */}
         <div
           className={`sm:w-1/4 flex flex-col gap-3 
           ${showFilter ? 'flex' : 'hidden sm:flex'}`}
@@ -70,6 +76,7 @@ const Doctors = () => {
 
             <p
               key={item}
+
               onClick={() => {
 
                 if (speciality === item) {
@@ -78,19 +85,17 @@ const Doctors = () => {
 
                 } else {
 
-                  navigate(`/doctors/${item}`)
+                  navigate(`/doctors/${encodeURIComponent(item)}`)
 
                 }
 
               }}
 
               className={`cursor-pointer border rounded-lg px-4 py-2
-
               ${speciality === item
                   ? 'bg-blue-100 border-blue-500 text-blue-700'
                   : 'border-gray-300 hover:bg-gray-100'
-                }
-              `}
+                }`}
             >
 
               {item}
@@ -101,45 +106,61 @@ const Doctors = () => {
 
         </div>
 
-
+        {/* Doctors Grid */}
         <div className="w-full grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-6">
 
-          {filterDoc.map((item) => (
+          {filterDoc.length > 0 ? (
 
-            <div
-              key={item._id}
-              onClick={() => navigate(`/appointment/${item._id}`)}
+            filterDoc.map((item) => (
 
-              className="bg-blue-50 border border-blue-200 rounded-2xl overflow-hidden
-              hover:shadow-lg hover:-translate-y-2 transition-all duration-300 cursor-pointer"
-            >
+              <div
+                key={item._id}
 
-              <img
-                src={item.image}
-                alt={item.name}
-                className="w-full h-64 object-contain p-6"
-              />
+                onClick={() => navigate(`/appointment/${item._id}`)}
 
-              <div className="bg-white p-4">
+                className="bg-blue-50 border border-blue-200 rounded-2xl overflow-hidden
+                hover:shadow-lg hover:-translate-y-2 transition-all duration-300 cursor-pointer"
+              >
 
-                <div className="flex items-center gap-2 text-green-500 text-sm mb-2">
-                  <span className="w-2 h-2 bg-green-500 rounded-full"></span>
-                  <span>Available</span>
+                <img
+                  src={item.image}
+                  alt={item.name}
+                  className="w-full h-64 object-cover"
+                />
+
+                <div className="bg-white p-4">
+
+                  <div className="flex items-center gap-2 text-green-500 text-sm mb-2">
+
+                    <span className="w-2 h-2 bg-green-500 rounded-full"></span>
+
+                    <span>
+                      {item.available ? "Available" : "Not Available"}
+                    </span>
+
+                  </div>
+
+                  <h3 className="text-lg font-semibold">
+                    {item.name}
+                  </h3>
+
+                  <p className="text-gray-500 text-sm">
+                    {item.speciality}
+                  </p>
+
                 </div>
-
-                <h3 className="text-lg font-semibold">
-                  {item.name}
-                </h3>
-
-                <p className="text-gray-500 text-sm">
-                  {item.speciality}
-                </p>
 
               </div>
 
-            </div>
+            ))
 
-          ))}
+          ) : (
+
+            <p className="text-gray-500">
+              No doctors found
+            </p>
+
+          )}
 
         </div>
 

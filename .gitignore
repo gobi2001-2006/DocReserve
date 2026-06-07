@@ -1,4 +1,24 @@
+# Dependencies
 node_modules/
+
+# Environment Variables
 .env
-backend/node_modules/
 backend/.env
+frontend/.env
+admin/.env
+
+# Build Files
+dist/
+build/
+
+# VS Code
+.vscode/
+
+# Logs
+*.log
+
+# OS Files
+.DS_Store
+Thumbs.db
+uploads/
+backend/uploads/
