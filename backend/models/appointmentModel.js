@@ -55,7 +55,16 @@ const appointmentSchema = new mongoose.Schema({
   isCompleted: {
     type: Boolean,
     default: false
-  }
+  },
+  prescription: {
+  type: String,
+  default: ""
+},
+
+prescriptionNotes: {
+  type: String,
+  default: ""
+}
 
 });
 

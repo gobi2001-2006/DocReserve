@@ -2,6 +2,8 @@ import doctorModel from "../models/doctorModel.js";
 import appointmentModel from "../models/appointmentModel.js";
 import bcrypt from "bcrypt";
 import jwt from "jsonwebtoken";
+import { v2 as cloudinary } from "cloudinary"
+
 
 // Change doctor availability
 const changeAvailability = async (req, res) => {
@@ -35,7 +37,74 @@ const changeAvailability = async (req, res) => {
     });
   }
 };
+const uploadPrescription =
+async (req,res)=>{
 
+ try{
+
+  const {
+   appointmentId,
+   notes
+  } = req.body
+
+  const file =
+   req.file
+
+  const result =
+   await cloudinary.uploader.upload(
+
+    file.path,
+
+    {
+      resource_type:"auto"
+    }
+
+   )
+
+  await appointmentModel.findByIdAndUpdate(
+
+   appointmentId,
+
+   {
+
+    prescription:
+      result.secure_url,
+
+    prescriptionNotes:
+      notes,
+
+    isCompleted:true
+
+   }
+
+  )
+
+  res.json({
+
+   success:true,
+
+   message:
+   "Prescription Uploaded"
+
+  })
+
+ }
+
+ catch(error){
+
+  console.log(error)
+
+  res.json({
+
+   success:false,
+
+   message:error.message
+
+  })
+
+ }
+
+}
 // Get doctors for frontend
 const doctorList = async (req, res) => {
   try {
@@ -329,4 +398,6 @@ export { changeAvailability, doctorList,
 
   updateDoctorProfile,
 
-  completeAppointment };
+  completeAppointment ,
+uploadPrescription
+ };

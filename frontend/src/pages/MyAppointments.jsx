@@ -230,6 +230,7 @@ const MyAppointments = () => {
 
       <hr className="mb-6" />
 
+
       {
 
         appointments.length === 0 ? (
@@ -329,34 +330,100 @@ const MyAppointments = () => {
                       </p>
 
                       <p
+  className={
+    item.cancelled
+      ? "text-red-500 font-medium"
+      : "text-green-500 font-medium"
+  }
+>
 
-                        className={
+  {
+    item.cancelled
+      ? "Cancelled"
+      : item.payment
+      ? "Paid"
+      : "Active"
+  }
 
-                          item.cancelled
+</p>
 
-                            ? "text-red-500 font-medium"
+{/* Prescription Section */}
 
-                            : "text-green-500 font-medium"
+{
+  item.prescription && (
 
-                        }
+    <div className="mt-3">
 
-                      >
+      <a
 
-                        {
+        href={item.prescription}
 
-                          item.cancelled
+        target="_blank"
 
-                            ? "Cancelled"
+        rel="noreferrer"
 
-                            : item.payment
+        className="
+        text-blue-600
+        underline
+        block
+        "
 
-                            ? "Paid"
+      >
 
-                            : "Active"
+        View Prescription
 
-                        }
+      </a>
 
-                      </p>
+      <a
+
+        href={item.prescription}
+
+        download
+
+        className="
+        inline-block
+        mt-2
+        border
+        border-blue-600
+        text-blue-600
+        px-4
+        py-1
+        rounded
+        hover:bg-blue-50
+        "
+
+      >
+
+        Download Prescription
+
+      </a>
+
+    </div>
+
+  )
+}
+
+{
+  item.prescriptionNotes && (
+
+    <div className="mt-3">
+
+      <p className="font-semibold text-gray-700">
+
+        Doctor Notes
+
+      </p>
+
+      <p className="text-gray-600">
+
+        {item.prescriptionNotes}
+
+      </p>
+
+    </div>
+
+  )
+}
 
                     </div>
 

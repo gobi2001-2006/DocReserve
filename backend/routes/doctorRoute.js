@@ -7,11 +7,12 @@ import {
   doctorAppointments,
   doctorProfile,
   updateDoctorProfile,
-  completeAppointment
+  completeAppointment,uploadPrescription
 }
 from '../controllers/doctorController.js'
 
 import authDoctor from '../middlewares/authDoctor.js'
+import upload from "../middlewares/multer.js"
 
 const doctorRouter = express.Router()
 
@@ -24,6 +25,13 @@ doctorRouter.get(
   '/dashboard',
   authDoctor,
   doctorDashboard
+)
+
+doctorRouter.post(
+  "/upload-prescription",
+  authDoctor,
+  upload.single("prescription"),
+  uploadPrescription
 )
 
 doctorRouter.get(
