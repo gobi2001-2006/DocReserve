@@ -1,6 +1,5 @@
 import React, { useState } from 'react';
-import { assets } from '../assets/assets;'
-
+import { assets } from "../assets/assets";
 const About = () => {
 
   const [activeIndex, setActiveIndex] = useState(0)
