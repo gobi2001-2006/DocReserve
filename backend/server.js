@@ -16,7 +16,9 @@ connectCloudinary()
 
 // Middlewares
 app.use(express.json())
-app.use(cors())
+app.use(cors({
+  origin: "*", // for now (later restrict)
+}));
 
 // Debug middleware
 app.use((req, res, next) => {
@@ -31,6 +33,9 @@ app.use('/api/user', userRouter)
 app.get('/', (req, res) => {
     res.send('API WORKING')
 })
+app.get("/healthz", (req, res) => {
+  res.send("OK");
+});
 
 // Error handler
 app.use((err, req, res, next) => {

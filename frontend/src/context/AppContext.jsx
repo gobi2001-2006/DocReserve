@@ -6,7 +6,7 @@ export const AppContext = createContext();
 
 const AppcontextProvider = (props) => {
 
-  const backendUrl = "http://localhost:4000";
+ const backendUrl = import.meta.env.VITE_BACKEND_URL;
   const currencySymbol = "₹";
 
   const [doctors, setDoctors] = useState([]);
