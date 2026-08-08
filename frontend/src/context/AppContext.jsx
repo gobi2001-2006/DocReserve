@@ -6,7 +6,7 @@ export const AppContext = createContext();
 
 const AppcontextProvider = (props) => {
 
- const backendUrl = https://docreserve-w7v6.onrender.com/;
+ const backendUrl = import.meta.env.VITE_BACKEND_URL;
   const currencySymbol = "₹";
 
   const [doctors, setDoctors] = useState([]);
