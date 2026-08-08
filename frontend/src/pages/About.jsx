@@ -1,5 +1,5 @@
-import React, { useState } from 'react'
-import { assets } from '../assets/assets'
+import React, { useState } from 'react';
+import { assets } from '../assets/assets;'
 
 const About = () => {
 
@@ -90,4 +90,4 @@ const About = () => {
   )
 }
 
-export default About
+export default About;

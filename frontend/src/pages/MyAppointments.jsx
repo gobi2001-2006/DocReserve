@@ -1,7 +1,7 @@
-import React, { useContext, useEffect, useState } from 'react'
-import axios from 'axios'
-import { AppContext } from '../context/AppContext'
-import { toast } from 'react-toastify'
+import React, { useContext, useEffect, useState } from 'react';;
+import axios from 'axios';
+import { AppContext } from '../context/AppContext';
+import { toast } from 'react-toastify';
 
 const MyAppointments = () => {
 
@@ -535,4 +535,4 @@ const MyAppointments = () => {
 
 }
 
-export default MyAppointments
+export default MyAppointments;

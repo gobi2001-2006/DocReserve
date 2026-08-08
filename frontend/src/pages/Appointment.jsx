@@ -1,9 +1,9 @@
-import React, { useContext, useEffect, useState } from 'react'
-import { useParams, useNavigate } from 'react-router-dom'
-import { AppContext } from '../context/AppContext'
-import { assets } from '../assets/assets'
-import axios from 'axios'
-import { toast } from 'react-toastify'
+import React, { useContext, useEffect, useState } from 'react';
+import { useParams, useNavigate } from 'react-router-dom';
+import { AppContext } from '../context/AppContext';
+import { assets } from '../assets/assets';
+import axios from 'axios';
+import { toast } from 'react-toastify';
 
 const Appointment = () => {
 
@@ -448,4 +448,4 @@ const Appointment = () => {
 
 }
 
-export default Appointment
+export default Appointment;
