@@ -10,11 +10,13 @@ import userRouter from './routes/userRoute.js'
 const app = express()
 const port = process.env.PORT || 4000
 
-// ✅ CORS (ONLY ONCE)
 app.use(cors({
-  origin: "https://docreserve.netlify.app",
+  origin: [
+    "https://docreserve.netlify.app",
+    "https://docreserveadmin.netlify.app"
+  ],
   credentials: true
-}))
+}));
 
 // Middlewares
 app.use(express.json())
